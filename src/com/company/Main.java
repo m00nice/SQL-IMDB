@@ -10,7 +10,7 @@ public class Main {
 
     public static void main(String[] args) throws FileNotFoundException {
 
-        File file = new File("src/DATA/imdb-data.csv");
+        File file = new File("imdb-data.csv");
         Scanner filereader = new Scanner(file);
         Scanner scanner = new Scanner(System.in);
         DATA data = new DATA();
