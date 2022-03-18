@@ -13,7 +13,7 @@ public class Main {
     static Connection con;
     static Statement stmt;
 
-    public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException{
 
 
 
@@ -30,7 +30,7 @@ public class Main {
         System.out.println("Write database name");
 
         String databaseName = userInput.next();
-        Class.forName("com.mysql.jdbc.Driver");
+
         //CREATE DATABASE
         try{
 
@@ -64,12 +64,25 @@ public class Main {
                         for (int i = 0; i < columnName.length; i++) {
                             stringBuilder.append("'" + columnName[i] + "'" + columnDatatype[i] + ",");
                         }
-                        stringBuilder.append(")");
+                        stringBuilder.append(");");
 
                         stmt = con.createStatement();
 
                         stmt.executeUpdate(String.valueOf(stringBuilder));
-
+                        //ADD DATA TO TABLE
+                        while(scanner.hasNext()) {
+                            String[] data = scanner.nextLine().split(";");
+                            StringBuilder stringBuilder2 = new StringBuilder("INSERT INTO " + tableName + "(");
+                            for (int i = 0; i < columnName.length; i++) {
+                                stringBuilder2.append("'"+columnName[i]+"',");
+                            }
+                            stringBuilder2.append(") VALUES (");
+                            for (int i = 0; i < data.length; i++) {
+                                stringBuilder2.append("'" + data[i] + "',");
+                            }
+                            stringBuilder2.append(");");
+                            stmt.executeUpdate(String.valueOf(stringBuilder2));
+                        }
                         running = false;
                     }
                     case "2" -> {
@@ -82,28 +95,41 @@ public class Main {
                             columnName[i] = newColumnName;
                         }
                         String[] columnDatatype = new String[columnAmount.length];
-                        for (int i = 0; i < columnAmount.length; i++) {
+                        for (int i = 0; i < columnName.length; i++) {
                             System.out.println("Write"+i+". column datatypes and storage");
                             String NewColumnDatatype = userInput.next().toUpperCase();
                             columnDatatype[i] = NewColumnDatatype;
                         }
                         StringBuilder stringBuilder = new StringBuilder("CREATE TABLE '" + databaseName + "'.'" + tableName + "'(");
-                        for (int i = 0; i < columnAmount.length; i++) {
+                        for (int i = 0; i < columnName.length; i++) {
                             stringBuilder.append("'" + columnName[i] + "'" + columnDatatype[i] + ",");
                         }
-                        stringBuilder.append(")");
+                        stringBuilder.append(");");
 
                         stmt = con.createStatement();
 
                         stmt.executeUpdate(String.valueOf(stringBuilder));
+                        //ADD DATA TO TABLE
+                        while(scanner.hasNext()) {
+                            String[] data = scanner.nextLine().split(";");
+                            StringBuilder stringBuilder2 = new StringBuilder("INSERT INTO " + tableName + "(");
+                            for (int i = 0; i < columnName.length; i++) {
+                                stringBuilder2.append("'"+columnName[i]+"',");
 
+                            }
+                            stringBuilder2.append(") VALUES (");
+                            for (int i = 0; i < data.length; i++) {
+                                stringBuilder2.append("'" + data[i] + "',");
+                            }
+                            stringBuilder2.append(");");
+                            stmt.executeUpdate(String.valueOf(stringBuilder2));
+                        }
                         running = false;
                     }
                 }
             }
-        } catch (Exception e){ e.printStackTrace();}
 
-        //ADD DATA TO TABLE
+        } catch (Exception e){ e.printStackTrace();}
 
 
     }
