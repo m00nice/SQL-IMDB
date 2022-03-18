@@ -1,61 +1,110 @@
 package com.company;
 
-import DATA.DATA;
-
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    static Connection con;
+    static Statement stmt;
 
-        File file = new File("imdb-data.csv");
-        Scanner filereader = new Scanner(file);
-        Scanner scanner = new Scanner(System.in);
-        DATA data = new DATA();
-        String tableName = scanner.next();
-        String[] columnsData = filereader.nextLine().split(";");
+    public static void main(String[] args) throws FileNotFoundException, ClassNotFoundException {
 
-        String column1 = "";
-        String column2 = "";
-        String column3 = "";
-        String column4 = "";
-        String column5 = "";
-        String column6 = "";
-        String column7 = "";
 
-        for (int i = 0; i < columnsData.length; i++) {
-        if(i == 1){column1 = columnsData[i];}
-        if(i == 2){column2 = columnsData[i];}
-        if(i == 3){column3 = columnsData[i];}
-        if(i == 4){column4 = columnsData[i];}
-        if(i == 5){column5 = columnsData[i];}
-        if(i == 6){column6 = columnsData[i];}
-        if(i == 7){column7 = columnsData[i];}
-        }
-        System.out.println(data.createTable(tableName,column1,column2,column3,column4,column5,column6,column7,columnsData.length));
 
-        while (filereader.hasNext()) {
-            String data1 = "";
-            String data2 = "";
-            String data3 = "";
-            String data4 = "";
-            String data5 = "";
-            String data6 = "";
-            String data7 = "";
-            String[] datas = filereader.nextLine().split(";");
-            for (int j = 0; j < datas.length; j++) {
-                if(j == 1){data1 = datas[j];}
-                if(j == 2){data2 = datas[j];}
-                if(j == 3){data3 = datas[j];}
-                if(j == 4){data4 = datas[j];}
-                if(j == 5){data5 = datas[j];}
-                if(j == 6){data6 = datas[j];}
-                if(j == 7){data7 = datas[j];}
+        File file = new File("src/com/company/imdb-data.csv");
+        Scanner scanner = new Scanner(file);
+        Scanner userInput = new Scanner(System.in);
+
+        System.out.println("Write Username");
+        //String username = userInput.next();
+
+        System.out.println("Write Password");
+        //String password = userInput.next();
+
+        System.out.println("Write database name");
+
+        String databaseName = userInput.next();
+        Class.forName("com.mysql.jdbc.Driver");
+        //CREATE DATABASE
+        try{
+
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306", "m00nice", "Totodile2305");
+
+            stmt = con.createStatement();
+
+            stmt.executeUpdate("CREATE SCHEMA '"+databaseName+"'");
+        } catch (Exception e){ e.printStackTrace();}
+
+        //CREATE TABLE
+        try{
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/"+databaseName, "m00nice", "Totodile2305");
+            System.out.println("Write table name");
+            String tableName = userInput.next();
+            boolean running = true;
+            while(running){
+                System.out.println("Indholder første linje af filen column titler?\n 1 for JA\n 2 for NEJ");
+
+                switch (userInput.next()){
+                    case "1" -> {
+                        String[] columnName = scanner.nextLine().split(";");
+
+                        String[] columnDatatype = new String[columnName.length];
+                        for (int i = 0; i < columnName.length; i++) {
+                            System.out.println("Write"+i+". column datatypes and storage");
+                            String NewColumnDatatype = userInput.next().toUpperCase();
+                            columnDatatype[i] = NewColumnDatatype;
+                        }
+                        StringBuilder stringBuilder = new StringBuilder("CREATE TABLE '" + databaseName + "'.'" + tableName + "'(");
+                        for (int i = 0; i < columnName.length; i++) {
+                            stringBuilder.append("'" + columnName[i] + "'" + columnDatatype[i] + ",");
+                        }
+                        stringBuilder.append(")");
+
+                        stmt = con.createStatement();
+
+                        stmt.executeUpdate(String.valueOf(stringBuilder));
+
+                        running = false;
+                    }
+                    case "2" -> {
+                        String[] columnAmount = scanner.nextLine().split(";");
+                        scanner.reset();
+                        String[] columnName = new String[columnAmount.length];
+                        for (int i = 0; i < columnAmount.length; i++) {
+                            System.out.println("Write "+i+". column name");
+                            String newColumnName = userInput.next();
+                            columnName[i] = newColumnName;
+                        }
+                        String[] columnDatatype = new String[columnAmount.length];
+                        for (int i = 0; i < columnAmount.length; i++) {
+                            System.out.println("Write"+i+". column datatypes and storage");
+                            String NewColumnDatatype = userInput.next().toUpperCase();
+                            columnDatatype[i] = NewColumnDatatype;
+                        }
+                        StringBuilder stringBuilder = new StringBuilder("CREATE TABLE '" + databaseName + "'.'" + tableName + "'(");
+                        for (int i = 0; i < columnAmount.length; i++) {
+                            stringBuilder.append("'" + columnName[i] + "'" + columnDatatype[i] + ",");
+                        }
+                        stringBuilder.append(")");
+
+                        stmt = con.createStatement();
+
+                        stmt.executeUpdate(String.valueOf(stringBuilder));
+
+                        running = false;
+                    }
+                }
             }
-            System.out.println(data.insertDATA(tableName,column1,column2,column3,column4,column5,column6,column7,data1,data2,data3,data4,data5,data6,data7, datas.length));
-        }
+        } catch (Exception e){ e.printStackTrace();}
+
+        //ADD DATA TO TABLE
+
 
     }
 }
